@@ -19,3 +19,11 @@
 
 include_recipe "mysql::server"
 include_recipe "rvm_passenger::nginx"
+
+include_recipe "imagemagick"
+package "libmagickwand-dev"
+
+include_recipe "stompserver"
+
+package "geoip-bin"
+package "libgeoip-dev"

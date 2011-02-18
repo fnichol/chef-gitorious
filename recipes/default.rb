@@ -18,7 +18,8 @@
 #
 
 include_recipe "mysql::server"
-include_recipe "rvm_passenger::nginx"
+
+include_recipe "rvm_passenger::#{node[:gitorious][:web_server]}"
 
 include_recipe "imagemagick"
 package "libmagickwand-dev"

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [ -s "${HOME}/.rvm/scripts/rvm" ] ; then
+  source "${HOME}/.rvm/scripts/rvm"
+elif [ -s "<%= File.dirname(node[:rvm][:root_path]) %>/lib/rvm" ] ; then
+  source "<%= File.dirname(node[:rvm][:root_path]) %>/lib/rvm"
+else
+  echo "ERROR: Cannot load RVM environment" >&2
+  exit 1
+fi
+
+RAILS_ENV=<%= @rails_env %>
+exec rvm <%= @ruby_string %> ruby <%= @current_path %>/script/gitorious "$@"

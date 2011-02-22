@@ -1,6 +1,6 @@
 <%= @rails_env %>:
   # The session secret key (`apg -m 64` is always useful for this kinda stuff)
-  cookie_secret: ssssht
+  cookie_secret: "<%= node[:gitorious][:cookie_secret] %>"
 
   # The path where git repositories are stored. The actual (bare) repositories resides
   # in repository_base_path/#{project.slug}/#{repository.name}.git/:

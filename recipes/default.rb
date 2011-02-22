@@ -315,6 +315,27 @@ template "#{current_path}/config/database.yml" do
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
+execute "create_cookie_secret" do
+  cwd         current_path
+  user        app_user
+  group       app_user
+  command     <<-CMD
+    apg -m 64 > #{current_path}/config/cookie_secret.txt
+  CMD
+  creates     "#{current_path}/config/cookie_secret.txt"
+end
+
+ruby_block "fetch_cookie_secret" do
+  block do
+    file = ::File.open("#{current_path}/config/cookie_secret.txt", "rb")
+    secret = file.read
+    file.close
+
+    secret = secret.gsub(/$/, '\\').sub(/\\\n\\\z/, '') # fix line endings
+    node.set[:gitorious][:cookie_secret] = secret
+  end
+end
+
 template "#{current_path}/config/gitorious.yml" do
   source      "gitorious.yml.erb"
   owner       app_user

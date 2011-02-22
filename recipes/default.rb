@@ -360,6 +360,7 @@ execute "bootstrap_gitorious_ultrasphinx" do
   command     <<-CMD
     #{g_rake_bin} RAILS_ENV=#{rails_env} ultrasphinx:bootstrap
   CMD
+  creates     "#{current_path}/config/ultrasphinx/#{rails_env}.conf"
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 

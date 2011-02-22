@@ -407,16 +407,19 @@ cron "gitorious_ultrasphinx_reindexing" do
 end
 
 service "git-ultrasphinx" do
-  action      :enable
-  supports    :restart => true, :reload => true, :status => true
+  action      [ :enable, :start ]
+  pattern     "searchd"
+  supports    :restart => true, :reload => true, :status => false
 end
 
 service "git-daemon" do
-  action      :enable
+  action      [ :enable, :start ]
   supports    :restart => true, :reload => false, :status => false
 end
 
 service "git-poller" do
-  action      :enable
-  supports    :restart => false, :reload => false, :status => false
+  action      [ :enable, :start ]
+  pattern     "poller"
+  supports    :restart => true, :reload => true, :status => false
+end
 end

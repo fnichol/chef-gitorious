@@ -422,4 +422,20 @@ service "git-poller" do
   pattern     "poller"
   supports    :restart => true, :reload => true, :status => false
 end
+
+execute "create_gitorious_admin_user" do
+  cwd         current_path
+  user        app_user
+  group       app_user
+  command     <<-CMD.sub(/^ {4}/, '')
+    cat <<_INPUT | RAILS_ENV=#{rails_env} #{g_ruby_bin} script/create_admin
+    #{node[:gitorious][:admin][:email]}
+    #{node[:gitorious][:admin][:password]}
+    _INPUT
+  CMD
+  only_if     <<-ONLYIF
+    cd #{current_path} && \
+    RAILS_ENV=#{rails_env} #{g_ruby_bin} script/runner \
+      'User.find_by_is_admin(true) and abort'
+  ONLYIF
 end

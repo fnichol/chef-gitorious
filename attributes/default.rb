@@ -25,6 +25,9 @@ default[:gitorious][:notification_emails] = ""
 default[:gitorious][:public_mode]         = "true"
 default[:gitorious][:only_admins_create]  = "false"
 
+default[:gitorious][:admin][:email]       = "admin@gitorious.local"
+default[:gitorious][:admin][:password]    = "admin"
+
 default[:gitorious][:optional_tls][:url] =
   "git://github.com/collectiveidea/action_mailer_optional_tls.git"
 

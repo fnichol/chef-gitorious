@@ -22,7 +22,7 @@
   gitorious_host: <%= node[:gitorious][:host] %>
 
   # User which is running git daemon
-  gitorious_user: git
+  gitorious_user: <%= node[:gitorious][:app_user] %>
 
   # Email address to the support for the Gitorious server
   gitorious_support_email: <%= node[:gitorious][:support_email] %>

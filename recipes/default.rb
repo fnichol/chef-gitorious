@@ -33,6 +33,7 @@ git_url       = node[:gitorious][:git][:url]
 git_reference = node[:gitorious][:git][:reference]
 app_user      = node[:gitorious][:app_user]
 rails_env     = node[:gitorious][:rails_env]
+deploy_to     = node[:gitorious][:app_base_dir]
 current_path  = "#{node[:gitorious][:app_base_dir]}/current"
 shared_path   = "#{node[:gitorious][:app_base_dir]}/shared"
 git_base_dir  = node[:gitorious][:git_base_dir]
@@ -42,12 +43,14 @@ db_username   = node[:gitorious][:db][:user]
 db_password   = node[:gitorious][:db][:password]
 g_ruby_bin    = "#{node[:rvm][:root_path]}/bin/gitorious_ruby"
 g_rake_bin    = "#{node[:rvm][:root_path]}/bin/gitorious_rake"
+g_bundle_bin  = "#{node[:rvm][:root_path]}/bin/gitorious_bundle"
+g_gem_bin     = "#{node[:rvm][:root_path]}/bin/gitorious_gem"
 
 rvm_gemset rvm_ruby
 
 rvm_wrapper "gitorious" do
   ruby_string rvm_ruby
-  binaries    %w{ rake ruby }
+  binaries    %w{ rake ruby gem bundle }
 end
 
 include_recipe "webapp"
@@ -61,6 +64,7 @@ include_recipe "imagemagick"
 include_recipe "stompserver"
 
 package "sphinxsearch"
+package "memcached"
 package "apg"
 package "git-svn"
 package "libonig-dev"
@@ -70,7 +74,7 @@ package "libgeoip-dev"
 
 
 user app_user do
-  system  true
+  system    true
 end
 
 group "gitorious" do
@@ -78,18 +82,19 @@ group "gitorious" do
   append  true
 end
 
-directory "/home/#{app_user}/.ssh" do
-  owner       app_user
-  group       app_user
-  mode        "0700"
-  recursive   true
+group "rvm" do
+  members [ app_user ]
+  append  true
 end
 
-execute "create_empty_git_authorized_keys" do
-  user      app_user
-  group     app_user
-  command   %{touch /home/#{app_user}/.ssh/authorized_keys}
-  creates   "/home/#{app_user}/.ssh/authorized_keys"
+file "/home/#{app_user}/.ssh/authorized_keys" do
+  owner       app_user
+  group       app_user
+  mode        "0600"
+  action      :create
+  not_if do
+    ::File.exists? "/home/#{app_user}/.ssh/authorized_keys"
+  end
 end
 
 directory git_base_dir do
@@ -166,15 +171,41 @@ git current_path do
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
-rvm_shell "gitorious_bundle" do
+template "#{current_path}/.rvmrc" do
+  source      "rvmrc.erb"
+  owner       app_user
+  group       app_user
+  mode        "0644"
+  variables(
+    :rvm_env_path => "#{node[:rvm][:root_path]}/environments/#{rvm_ruby}",
+    :ruby_string  => rvm_ruby
+  )
+  notifies    :run, "execute[restart_gitorious_webapp]"
+end
+
+execute "gitorious_bundle" do
   cwd         current_path
   user        app_user
   group       app_user
-  ruby_string rvm_ruby
-  code        <<-CMD
-    bundle install --gemfile #{current_path}/Gemfile --without development test
+  command     <<-CMD
+    HOME=/home/#{app_user} #{g_bundle_bin} install \
+      --verbose --without development test
   CMD
-  creates     "#{current_path}/.bundle/config"
+  not_if      <<-NOTIF
+    #{g_gem_bin} list --no-versions --no-details --local stomp | \
+      grep -q '^stomp$'
+  NOTIF
+  notifies    :run, "execute[restart_gitorious_webapp]"
+end
+
+execute "install_options_tls_plugin" do
+  cwd         current_path
+  user        app_user
+  group       app_user
+  command     <<-CMD
+    #{g_ruby_bin} script/plugin install #{node[:gitorious][:optional_tls][:url]}
+  CMD
+  creates   "#{current_path}/vendor/plugins/action_mailer_optional_tls/init.rb"
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
@@ -230,23 +261,29 @@ template "/usr/local/bin/gitorious" do
   )
 end
 
-template "#{current_path}/.rvmrc" do
-  source      "rvmrc.erb"
-  owner       app_user
-  group       app_user
-  mode        "0640"
-  variables(
-    :rvm_env_path => "#{node[:rvm][:root_path]}/environments/#{rvm_ruby}",
-    :ruby_string  => rvm_ruby
-  )
-  notifies    :run, "execute[restart_gitorious_webapp]"
-end
-
 cookbook_file "#{current_path}/config/setup_load_paths.rb" do
   source      "setup_load_paths.rb"
   owner       app_user
   group       app_user
+  mode        "0644"
+  notifies    :run, "execute[restart_gitorious_webapp]"
+end
+
+template "#{current_path}/config/environments/#{rails_env}.rb" do
+  source      "environments_production.rb.erb"
+  owner       app_user
+  group       app_user
   mode        "0640"
+  variables(
+    :delivery_method  => node[:gitorious][:mailer][:delivery_method],
+    :tls              => node[:gitorious][:smtp][:tls],
+    :address          => node[:gitorious][:smtp][:address],
+    :port             => node[:gitorious][:smtp][:port],
+    :domain           => node[:gitorious][:smtp][:domain],
+    :authentication   => node[:gitorious][:smtp][:authentication],
+    :username         => node[:gitorious][:smtp][:username],
+    :password         => node[:gitorious][:smtp][:password]
+  )
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
@@ -288,14 +325,13 @@ template "#{current_path}/config/broker.yml" do
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
-rvm_shell "migrate_gitorious_database" do
+execute "migrate_gitorious_database" do
   cwd         current_path
   user        app_user
   group       app_user
-  ruby_string rvm_ruby
-  code        <<-CMD
-    rake RAILS_ENV=#{rails_env} db:create && \
-    rake RAILS_ENV=#{rails_env} db:migrate
+  command     <<-CMD
+    #{g_rake_bin} RAILS_ENV=#{rails_env} db:create && \
+    #{g_rake_bin} RAILS_ENV=#{rails_env} db:migrate
   CMD
   notifies    :run, "execute[restart_gitorious_webapp]"
   not_if do
@@ -305,13 +341,12 @@ rvm_shell "migrate_gitorious_database" do
   end
 end
 
-rvm_shell "bootstrap_gitorious_ultrasphinx" do
+execute "bootstrap_gitorious_ultrasphinx" do
   cwd         current_path
   user        app_user
   group       app_user
-  ruby_string rvm_ruby
-  code        <<-CMD
-    rake RAILS_ENV=#{rails_env} ultrasphinx:bootstrap
+  command     <<-CMD
+    #{g_rake_bin} RAILS_ENV=#{rails_env} ultrasphinx:bootstrap
   CMD
   notifies    :run, "execute[restart_gitorious_webapp]"
 end

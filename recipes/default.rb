@@ -185,11 +185,11 @@ end
 
 execute "gitorious_bundle" do
   cwd         current_path
-  user        app_user
-  group       app_user
+  user        "root"
+  group       "root"
   command     <<-CMD
-    HOME=/home/#{app_user} #{g_bundle_bin} install \
-      --verbose --without development test
+    su --login --command "cd #{current_path} ; #{g_bundle_bin} install \
+      --verbose --without development test" #{app_user}
   CMD
   not_if      <<-NOTIF
     #{g_gem_bin} list --no-versions --no-details --local stomp | \

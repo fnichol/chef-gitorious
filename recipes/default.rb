@@ -198,6 +198,18 @@ execute "gitorious_bundle" do
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
+execute "create_gitorious_tmp" do
+  cwd         current_path
+  user        app_user
+  group       app_user
+  command     <<-CMD
+    #{g_rake_bin} RAILS_ENV=#{rails_env} tmp:create
+  CMD
+  not_if do
+    ::File.directory?("#{current_path}/tmp/pids")
+  end
+end
+
 execute "install_options_tls_plugin" do
   cwd         current_path
   user        app_user

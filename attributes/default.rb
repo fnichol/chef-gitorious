@@ -40,14 +40,3 @@ default[:gitorious][:smtp][:domain]         = ""
 default[:gitorious][:smtp][:authentication] = "plain"
 default[:gitorious][:smtp][:username]       = ""
 default[:gitorious][:smtp][:password]       = ""
-
-node[:webapp][:apps] << {
-  :id               => "gitorious",
-  :profile          => "rails",
-  :host_name        => node[:gitorious][:host],
-  :non_ssl_server   => "enable",
-  :ssl_server       => "enable",
-  :user             => "git"
-}
-
-node[:webapp][:users][:git] = { :deploy_keys => [] }

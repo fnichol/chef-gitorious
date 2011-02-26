@@ -46,6 +46,17 @@ g_rake_bin    = "#{node[:rvm][:root_path]}/bin/gitorious_rake"
 g_bundle_bin  = "#{node[:rvm][:root_path]}/bin/gitorious_bundle"
 g_gem_bin     = "#{node[:rvm][:root_path]}/bin/gitorious_gem"
 
+node[:webapp][:apps] << {
+  :id               => "gitorious",
+  :profile          => "rails",
+  :host_name        => node[:gitorious][:host],
+  :non_ssl_server   => "enable",
+  :ssl_server       => "enable",
+  :user             => app_user
+}
+
+node[:webapp][:users][:git] = { :deploy_keys => [] }
+
 rvm_gemset rvm_ruby
 
 rvm_wrapper "gitorious" do

@@ -37,7 +37,7 @@
   public_mode: <%= node[:gitorious][:public_mode] %>
 
   # Define your locale
-  locale: en
+  locale: <%= node[:gitorious][:locale] %>
 
   # Where should we store generated tarballs?
   # (should be readable by webserver, since we tell it to send the file using X-Sendfile)
@@ -50,7 +50,7 @@
   only_site_admins_can_create_projects: <%= node[:gitorious][:only_admins_create] %>
   
   # Should we hide HTTP clone urls?
-  hide_http_clone_urls: false
+  hide_http_clone_urls: <%= node[:gitorious][:hide_http_clone_urls] %>
 
   # Is this gitorious.org? Read: should we have a very flashy homepage?
   is_gitorious_dot_org: false

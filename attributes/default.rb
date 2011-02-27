@@ -28,6 +28,9 @@ default[:gitorious][:only_admins_create]  = "false"
 default[:gitorious][:admin][:email]       = "admin@gitorious.local"
 default[:gitorious][:admin][:password]    = "admin"
 
+default[:gitorious][:locale]               = "en"
+default[:gitorious][:hide_http_clone_urls] = "false"
+
 default[:gitorious][:optional_tls][:url] =
   "git://github.com/collectiveidea/action_mailer_optional_tls.git"
 

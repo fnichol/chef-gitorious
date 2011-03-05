@@ -218,6 +218,13 @@ template "#{current_path}/.rvmrc" do
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
+rvm_shell "trust_rvmrc" do
+  ruby_string rvm_ruby
+  user        app_user
+  group       app_user
+  code        %{rvm rvmrc trust #{current_path}}
+end
+
 execute "gitorious_bundle" do
   cwd         current_path
   user        "root"

@@ -41,10 +41,11 @@ db_host       = node[:gitorious][:db][:host]
 db_database   = node[:gitorious][:db][:database]
 db_username   = node[:gitorious][:db][:user]
 db_password   = node[:gitorious][:db][:password]
-g_ruby_bin    = "#{node[:rvm][:root_path]}/bin/gitorious_ruby"
-g_rake_bin    = "#{node[:rvm][:root_path]}/bin/gitorious_rake"
-g_bundle_bin  = "#{node[:rvm][:root_path]}/bin/gitorious_bundle"
-g_gem_bin     = "#{node[:rvm][:root_path]}/bin/gitorious_gem"
+bin_path      = ::File.dirname(node[:rvm][:root_path])
+g_ruby_bin    = "#{bin_path}/bin/gitorious_ruby"
+g_rake_bin    = "#{bin_path}/bin/gitorious_rake"
+g_bundle_bin  = "#{bin_path}/bin/gitorious_bundle"
+g_gem_bin     = "#{bin_path}/bin/gitorious_gem"
 
 node[:webapp][:apps] << {
   :id               => "gitorious",

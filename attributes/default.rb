@@ -1,9 +1,5 @@
-# TODO: currently using bundler branch from cjohansen until his work is pushed
-# to master mainline (approx Mar 04/11).
-default[:gitorious][:git][:url] =
-  "git://gitorious.org/~cjohansen/gitorious/cjohansens-mainline.git"
-default[:gitorious][:git][:reference] =
-  "68bdc6eae378fe51335ae6897bc1da25ba5afac8"
+default[:gitorious][:git][:url] = "git://gitorious.org/gitorious/mainline.git"
+default[:gitorious][:git][:reference] = "master"
 
 default[:gitorious][:web_server] = "nginx"
 

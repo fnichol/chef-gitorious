@@ -3,6 +3,9 @@ default[:gitorious][:git][:reference] = "master"
 
 default[:gitorious][:web_server] = "nginx"
 
+default[:gitorious][:ssl][:cert]  = "ssl-cert-snakeoil.pem"
+default[:gitorious][:ssl][:key]   = "ssl-cert-snakeoil.key"
+
 default[:gitorious][:app_user]      = "git"
 default[:gitorious][:app_base_dir]  = "/srv/gitorious"
 default[:gitorious][:git_base_dir]  = "/var/git"

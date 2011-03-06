@@ -53,6 +53,8 @@ node[:webapp][:apps] << {
   :host_name        => node[:gitorious][:host],
   :non_ssl_server   => "enable",
   :ssl_server       => "enable",
+  :ssl_cert         => node[:gitorious][:ssl][:cert],
+  :ssl_key          => node[:gitorious][:ssl][:key],
   :user             => app_user
 }
 

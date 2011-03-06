@@ -222,7 +222,7 @@ end
 # Gitorious is vendored with Rails 2.3.5 which is not compatible with newer RubyGems
 rvm_shell "set_rubygems_version" do
   ruby_string rvm_ruby
-  code        %{rvm rubygems 1.5.2}
+  code        %{gem --version | grep 1.5.2 || rvm rubygems 1.5.2}
 end
 
 execute "gitorious_bundle" do

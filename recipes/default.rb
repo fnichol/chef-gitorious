@@ -81,6 +81,7 @@ require 'mysql'
 include_recipe "imagemagick"
 include_recipe "stompserver"
 
+package "ssh"
 package "sphinxsearch"
 package "memcached"
 package "apg"

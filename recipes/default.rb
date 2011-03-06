@@ -185,7 +185,7 @@ git current_path do
   reference   git_reference
   user        app_user
   group       app_user
-  action      :checkout
+  action      :sync
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
@@ -222,8 +222,6 @@ end
 # Gitorious is vendored with Rails 2.3.5 which is not compatible with newer RubyGems
 rvm_shell "set_rubygems_version" do
   ruby_string rvm_ruby
-  user        app_user
-  group       app_user
   code        %{rvm rubygems 1.5.2}
 end
 

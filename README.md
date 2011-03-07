@@ -124,5 +124,104 @@ properly.
 a value of `git` should be avoided as it is reserved. Too bad, since that's
 usually a great first choice.
 
+## `support_email`
+
+Email address to the support for the Gitorious server. The default is
+`support@gitorious.org` and should be customized.
+
+## `notification_emails`
+
+List of email addresses to send server errors to seperated by whitespace.
+The default is an empty string.
+
+## `public_mode`
+
+Determines if Gitorious operates in a public mode (`true`) or in private
+mode (`false`). The default is `true` (public mode).
+
+## `only_admins_create`
+
+Determines whether or not only site admins can create new projects. The
+default is `false`.
+
+## `admin/email`
+
+The email address given to the `admin` which is used to initially log in.
+A default admin user will be created to manage the Gitorious instance. The
+default is `admin@gitorious.local` and this should be customized for any
+emails to be properly delivered.
+
+## `admin/password`
+
+An initial password for the `admin` user which is used to initially log in.
+The default is `admin`.
+
+**Note:** This attribute should be set or immediately updated to ensure
+good application security.
+
+## `locale`
+
+Sets the locale for Gitorious. Known values are `en`, `es`, `fr`, and
+`pt-BR`. The default is `en`.
+
+## `hide_http_clone_urls`
+
+Determines whether or not HTTP clone URLs are hidden from the interface.
+The default is `false`.
+
+## `optional_tls/url`
+
+The Git URL to the *action_mailer_optional_tls* rails plugin which is used
+to support SMTP/TLS mail deliveries. The default is
+[git://github.com/collectiveidea/action_mailer_optional_tls.git](git://github.com/collectiveidea/action_mailer_optional_tls.git).
+
+## `mailer/delivery_methods`
+
+Configures the delivery method for the Rails ActionMailer. For more details
+regarding ActionMailer tuning, see the [Rails Guides](http://guides.rubyonrails.org/v2.3.8/action_mailer_basics.html#action-mailer-configuration).
+The default is `smtp`.
+
+## `smtp/tls`
+
+Determines whether or not to require TLS when negotiating with the SMTP
+server. The default is `false`.
+
+## `smtp/address`
+
+The SMTP server that will deliver mail from Gitorious. The default is
+`smtp.example.com` which must be customized to ensure proper operation
+of Gitorious.
+
+## `smtp/port`
+
+The port that the SMTP server listens to. The default will attempt to connect
+on port 25.
+
+**Note:** If SSL/TLS is used, then you will want to customize the port. For
+example, Google's Gmail SMTP servers listen on port 587.
+
+## `smtp/domain`
+
+Allows the *action_mailer_optional_tls* rails plugin to set a domain which
+is primarily used when talking to Google's Gmail servers. Please see
+the plugin's [project page](https://github.com/collectiveidea/action_mailer_optional_tls)
+for more details. The default is an empty string.
+
+## `smtp/authentication`
+
+The authentication method to use when connecting to the SMTP server. The
+default is `plain`. To disable this attribute, set it to an empty string.
+
+## `smtp/username`
+
+The username to use when authenticating to the SMTP server. This will only
+be used if set. The default is unset (an empty string).
+
+## `smtp/password`
+
+The password to use when authenticating to the SMTP server. This will only
+be used if set. The default is unset (an empty string).
+
+
 # Usage
 

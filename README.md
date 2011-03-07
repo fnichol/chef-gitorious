@@ -224,6 +224,16 @@ be used if set. The default is unset (an empty string).
 
 # Usage
 
+# References
+
+* [Gitorious code mainline](http://gitorious.org/gitorious/mainline)
+* [Gitorious Ubuntu installation wiki](http://gitorious.org/gitorious/pages/UbuntuInstallation)
+* [Christian Johansen's Ubuntu installation](http://cjohansen.no/en/ruby/setting_up_gitorious_on_your_own_server)
+* [action_mailer_optional_tls plugin](https://github.com/collectiveidea/action_mailer_optional_tls)
+* [Rubygems 1.6 issue](http://cjohansen.no/en/ruby/setting_up_gitorious_on_your_own_server#toc52631_11_3)
+* [Rubygems 1.6 thread deprecation](http://www.ruby-forum.com/topic/1193619)
+* [RVM project](http://rvm.beginrescueend.com/)
+
 # License and Author
 
 Author:: Fletcher Nichol (<fnichol@nichol.ca>)

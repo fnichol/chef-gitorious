@@ -47,17 +47,6 @@ g_rake_bin    = "#{bin_path}/bin/gitorious_rake"
 g_bundle_bin  = "#{bin_path}/bin/gitorious_bundle"
 g_gem_bin     = "#{bin_path}/bin/gitorious_gem"
 
-node[:webapp][:apps] << {
-  :id               => "gitorious",
-  :profile          => "rails",
-  :host_name        => node[:gitorious][:host],
-  :non_ssl_server   => "enable",
-  :ssl_server       => "enable",
-  :ssl_cert         => node[:gitorious][:ssl][:cert],
-  :ssl_key          => node[:gitorious][:ssl][:key],
-  :user             => app_user
-}
-
 node[:webapp][:users][:git] = { :deploy_keys => [] }
 
 rvm_gemset rvm_ruby
@@ -68,6 +57,20 @@ rvm_wrapper "gitorious" do
 end
 
 include_recipe "webapp"
+
+user_account app_user do
+  gid             app_user
+end
+
+webapp_site_skel "gitorious" do
+  profile         "rails"
+  user            app_user
+  host_name       node[:gitorious][:host]
+  non_ssl_server  true
+  ssl_server      true
+  ssl_cert        node[:gitorious][:ssl][:cert]
+  ssl_key         node[:gitorious][:ssl][:key]
+end
 
 include_recipe "mysql::server"
 require 'rubygems'

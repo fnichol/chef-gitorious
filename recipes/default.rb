@@ -48,6 +48,7 @@ g_bundle_bin  = "#{bin_path}/bin/gitorious_bundle"
 g_gem_bin     = "#{bin_path}/bin/gitorious_gem"
 
 node[:webapp][:users][:git] = { :deploy_keys => [] }
+node.set[:stompserver][:rvm_ruby] = select_ruby(rvm_ruby) + "@stompserver"
 
 rvm_gemset rvm_ruby
 

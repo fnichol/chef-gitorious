@@ -226,8 +226,6 @@ end
 
 rvm_shell "trust_rvmrc" do
   ruby_string rvm_ruby
-  user        app_user
-  group       app_user
   code        %{rvm rvmrc trust #{current_path}}
 end
 

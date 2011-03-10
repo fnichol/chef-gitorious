@@ -34,6 +34,11 @@ A Git SHA hash, tag, or branch reference on the `node[:gitorious][:git][:url]`
 Git repository. Use this to lock down a specific revision (for reliable
 rebuilds over time), or to use an alternate branch. The default is `master`.
 
+**Note:** The Gitorious codebase is synced from the Git URL, meaning that
+running Chef again after some time could update the Rails application. If this
+is not your desired behavior be sure to set this attribute to a Git tag or
+SHA hash to lock in your version.
+
 ## `web_server`
 
 The HTTP web server front end to handle Gitorious traffic. Valid values are

@@ -189,29 +189,6 @@ git current_path do
   notifies    :run, "execute[restart_gitorious_webapp]"
 end
 
-# NOTE: Gitorious currently vendors rails 2.3.5 and is not compatible with newer
-# rubgems apis. This is a patch to work around the problem until upstream
-# fixes (2011-03-05)
-cookbook_file "#{shared_path}/patches/rubygems_1.5_fix.patch" do
-  source      "rubygems_1.5_fix.patch"
-  owner       app_user
-  group       app_user
-  mode        "0644"
-end
-
-# NOTE: Gitorious currently vendors rails 2.3.5 and is not compatible with newer
-# rubgems apis. This is a patch to work around the problem until upstream
-# fixes (2011-03-05)
-execute "apply_rubygems_fix" do
-  user        app_user
-  group       app_user
-  cwd         current_path
-  command     %{patch -p1 < #{shared_path}/patches/rubygems_1.5_fix.patch}
-  not_if      <<-GREP
-    grep -q "Gem::Requirement.default" #{current_path}/config/environment.rb
-  GREP
-end
-
 template "#{current_path}/.rvmrc" do
   source      "rvmrc.erb"
   owner       app_user

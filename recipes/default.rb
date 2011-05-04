@@ -63,14 +63,18 @@ user_account app_user do
   gid             app_user
 end
 
-webapp_site_skel "gitorious" do
-  profile         "rails"
-  user            app_user
+webapp_vhost_skel "gitorious" do               
   host_name       node[:gitorious][:host]
   non_ssl_server  true
   ssl_server      true
   ssl_cert        node[:gitorious][:ssl][:cert]
   ssl_key         node[:gitorious][:ssl][:key]
+end
+
+webapp_app_skel "gitorious" do
+  vhost           "gitorious"
+  profile         "rails"
+  user            app_user
 end
 
 include_recipe "mysql::server"

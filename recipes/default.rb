@@ -25,6 +25,8 @@ when "apache2"
   apache_module "ssl"
 end
 
+Chef::Log.info("Using RVM Ruby version: #{node[:rvm_passenger][:rvm_ruby]} for gitorious")
+
 rvm_ruby      = select_ruby(node[:rvm_passenger][:rvm_ruby]) + "@" +
                   node[:gitorious][:rvm_gemset]
 
@@ -41,7 +43,7 @@ db_host       = node[:gitorious][:db][:host]
 db_database   = node[:gitorious][:db][:database]
 db_username   = node[:gitorious][:db][:user]
 db_password   = node[:gitorious][:db][:password]
-bin_path      = ::File.dirname(node[:rvm][:root_path])
+bin_path      = node[:rvm][:root_path]
 g_ruby_bin    = "#{bin_path}/bin/gitorious_ruby"
 g_rake_bin    = "#{bin_path}/bin/gitorious_rake"
 g_bundle_bin  = "#{bin_path}/bin/gitorious_bundle"
@@ -60,12 +62,10 @@ end
 include_recipe "webapp"
 
 user_account app_user do
-  gid             app_user
+  create_group    true
 end
 
-webapp_site_skel "gitorious" do
-  profile         "rails"
-  user            app_user
+webapp_vhost_skel "gitorious" do
   host_name       node[:gitorious][:host]
   non_ssl_server  true
   ssl_server      true
@@ -73,13 +73,27 @@ webapp_site_skel "gitorious" do
   ssl_key         node[:gitorious][:ssl][:key]
 end
 
-include_recipe "mysql::server"
-require 'rubygems'
-Gem.clear_paths
-require 'mysql'
+webapp_app_skel "gitorious" do
+  vhost           "gitorious"
+  profile         "rails"
+  user            app_user
+end
 
+include_recipe "mysql::server"
 include_recipe "imagemagick"
 include_recipe "stompserver"
+
+ruby_block "require_mysql_rubygem" do
+  block do
+    require 'rubygems'
+    Gem.clear_paths
+    require 'mysql'
+  end
+end
+
+# Chef 0.10.10+
+# chef_gem 'mysql'
+# require 'mysql'
 
 package "ssh"
 package "sphinxsearch"
@@ -130,6 +144,13 @@ end
     mode        "2755"
     recursive   true
   end
+end
+
+directory deploy_to do
+  owner        app_user
+  group        app_user
+  mode         "2755"
+  recursive    true
 end
 
 execute "create_gitorious_mysql_database" do
@@ -221,6 +242,7 @@ end
 end
 
 # Gitorious is vendored with Rails 2.3.5 which is not compatible with newer RubyGems
+Chef::Log.info "Ruby version: #{rvm_ruby}"
 rvm_shell "set_rubygems_version" do
   ruby_string rvm_ruby
   code        %{gem --version | grep 1.5.2 || rvm rubygems 1.5.2}
@@ -232,11 +254,10 @@ execute "gitorious_bundle" do
   group       "root"
   command     <<-CMD
     su --login --command "cd #{current_path} ; #{g_bundle_bin} install \
-      --verbose --without development test" #{app_user}
+      --verbose --without development test --deployment" #{app_user}
   CMD
   not_if      <<-NOTIF
-    #{g_gem_bin} list --no-versions --no-details --local stomp | \
-      grep -q '^stomp$'
+    #{g_bundle_bin} check
   NOTIF
   notifies    :run, "execute[restart_gitorious_webapp]"
 end

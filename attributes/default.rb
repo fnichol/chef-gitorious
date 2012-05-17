@@ -42,3 +42,7 @@ default[:gitorious][:smtp][:domain]         = ""
 default[:gitorious][:smtp][:authentication] = "plain"
 default[:gitorious][:smtp][:username]       = ""
 default[:gitorious][:smtp][:password]       = ""
+
+# Defines default ruby version to 1.8.7 as it's the supported version to
+# run gitorious
+set[:rvm_passenger][:rvm_ruby] = '1.8.7'
